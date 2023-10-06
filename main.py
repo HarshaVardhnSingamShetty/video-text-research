@@ -22,7 +22,7 @@ def files():
         os.makedirs(image_frames)
 
     # specify the source video path
-    src_vid = cv2. VideoCapture('demo.mp4')
+    src_vid = cv2. VideoCapture('d2.mp4')
     return (src_vid)
 
 
@@ -60,19 +60,17 @@ def get_text():
     for i in os. listdir(image_frames):
         print(str(i))
         my_example = Image.open(image_frames + "/" + i)
-        # Grayscale image
-        ret, my_example = cv2.threshold(
-            np.array(my_example), 125, 255, cv2.THRESH_BINARY)
 
-        # Older versions of pytesseract need a pillow image
-        # Convert back if needed
+        # Preprocess the image
+        preprocessed_image = preprocess_image(np.array(my_example))
+        # Run OCR on the preprocessed image
+        text = pytesseract.image_to_string(
+            preprocessed_image, lang='eng', config='--psm 6 --oem 3')
 
-        my_example = Image.fromarray(my_example.astype(np.uint8))
-        text = pytesseract.image_to_string(my_example, lang='eng')
         print("texxttt =", text)
 
 
-# vid = files()
-# print("🚀 ~ file: main.py:60 ~ vid:", vid)
-# process(vid)
+vid = files()
+print("🚀 ~ file: main.py:60 ~ vid:", vid)
+process(vid)
 get_text()
