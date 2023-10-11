@@ -5,11 +5,12 @@ import pytesseract
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.tag import pos_tag
-import numpy as np
 import re
 import os
 import cv2
-
+import easyocr
+from matplotlib import pyplot as plt
+import numpy as np
 image_frames = 'image_frames'
 
 
@@ -27,6 +28,12 @@ def files():
 
 
 def process(src_vid):
+    # Check if the 'image_frames' directory exists, and if it does, delete all files in it
+    if os.path.exists(image_frames):
+        for filename in os.listdir(image_frames):
+            file_path = os.path.join(image_frames, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
     # Use an index to integer-name the files
     index = 0
     while src_vid.isOpened():
@@ -36,7 +43,7 @@ def process(src_vid):
         # name each frame and save as png
         name = './image_frames/frame' + str(index) + '.png'
         # save every 100th frame
-        if index % 100 == 0:
+        if index % 50 == 0:
             print('Extracting frames...' + name)
             cv2.imwrite(name, frame)
         index += 1
@@ -76,7 +83,7 @@ def clean_text(ocr_text):
     return cleaned_text
 
 
-def get_text():
+def get_text_tesseract_ocr():
     for i in os. listdir(image_frames):
         print(str(i))
         my_example = Image.open(image_frames + "/" + i)
@@ -92,7 +99,23 @@ def get_text():
         print("texxttt =", text)
 
 
+def get_text_easy_ocr():
+    for i in os. listdir(image_frames):
+        print("==============Text extracted from: ", str(i), "==============")
+
+        IMAGE_PATH = os.path.abspath(os.path.join(image_frames, i))
+
+        # IMAGE_PATH = 'frame200.png'
+        reader = easyocr.Reader(['en'])
+        result = reader.readtext(IMAGE_PATH)
+        for k in range(len(result)):
+            print(result[k][-2])
+
+
 vid = files()
-print("🚀 ~ file: main.py:60 ~ vid:", vid)
 process(vid)
-get_text()
+
+get_text_easy_ocr()
+
+
+# get_text_tesseract_ocr()
